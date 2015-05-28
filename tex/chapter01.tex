@@ -2,157 +2,36 @@
 %% chapter01.tex for SJTU Master Thesis
 %%==================================================
 
-\chapter{这是什么}
-\label{chap:what}
+\chapter{绪论}
+\label{chap:introduction}
 
-这是上海交通大学(非官方)学位论文 \LaTeX 模板，当前版本是 \version 。
+\section{Trivium算法的简单介绍}
 
-最早的一版学位模板是一位热心的物理系同学制作的。
-那份模板参考了自动化所学位论文模板，使用了CASthesis.cls文档类，中文字符处理则采用当时最为流行的 \CJKLaTeX 方案。
-我根据交大研究生院对学位论文的要求
-\footnote{\url{http://www.gs.sjtu.edu.cn/policy/fileShow.ahtml?id=130}}
-，结合少量个人审美喜好，完成了一份基本可用的交大 \LaTeX 学位论文模板。
-但是，搭建一个 \CJKLaTeX 环境并不简单，单单在Linux下配置环境和添加中文字体，就足够让新手打退堂鼓。
-在William Wang的建议下，我开始着手把模板向 \XeTeX 引擎移植。
-他完成了最初的移植，多亏了他出色的工作，后续的改善工作也得以顺利进行。
+Trivium算法是一种基于硬件的流密码算法，是欧洲流密码工程eSTREAM的最终胜选算法之一。其设计初衷是想试验是否存在一种简单的流密码算法能够兼具高效性、可变性以及最重要的安全性。
 
-随着我对 \LaTeX 系统认知增加，我又断断续续做了一些完善模板的工作，在原有硕士学位论文模板的基础上完成了交大学士和博士学位论文模板。
+由于物联网中各种芯片的逻辑门数肯定会有所限制，因此可能无法实现复杂的加密算法，所以作为流密码的Trivium似乎是一种不错的选择。因此Trivium算法的安全性和效率直接关系到未来的物联网中是否能使用Trivium算法作为一种加密标准被广泛采用。因为本文将对Trivium的安全性和效率进行研究。
 
-现在，交大学位论文模板SJTUTHesis代码在github
-\footnote{\url{https://github.com/weijianwen/SJTUThesis}}
-上维护。
-你可以\href{https://github.com/weijianwen/SJTUThesis/issues}{在github上开issue}
-、或者在\href{https://bbs.sjtu.edu.cn/bbsdoc?board=TeX_LaTeX}{水源LaTeX版}发帖来反映遇到的问题。
+通过对Trivium算法的安全性和效率的研究，本文著者希望给出在物联网中Trivium算法是否是合适的加密算法的判断，并且对Trivium算法加以改进，以使其更适合物联网的使用环境。
 
-\section{使用模板}
+具体地，本文研究了Trivium算法以及具有与Trivium算法相似结构的Trivium型算法，计算了Trivium型算法的内部状态位数的下限，并构造了几种能产生小周期的初始内部状态，通过分析构造方法，分析Trivium算法及Trivium型算法中的具体使用步骤是否安全。
 
-\subsection{准备工作}
-\label{sec:requirements}
 
-要使用这个模板撰写学位论文，需要在\emph{TeX系统}、\emph{中英文字体}、\emph{TeX技能}上有所准备。
+\section{物联网发展与现状}
 
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-	\item {\TeX}系统：所使用的{\TeX}系统要支持 \XeTeX 引擎，以2014年以后发布的\emph{完整}CTeX、TeXLive、MacTeX发行版为佳。
-	\item 中英文字体：操作系统中需要安装\footnote{在Windows、Mac OS X 以及 Linux 上安装额外的字体，可以参考\href{https://www.searchfreefonts.com/articles/how-to-install-fonts.htm}{“How to install fonts?”}。
-}TeX Gyre Termes字体\footnote{\url{http://www.gust.org.pl/projects/e-foundry/tex-gyre/termes}}和四款Adobe中文字体
-\footnote{请从合法渠道获得Adobe字体。}：AdobeSongStd、AdobeKaitiStd、AdobeHeitiStd、AdobeFangsongStd。
-	\item TeX技能：尽管提供了对模板的必要说明，但这不是一份“ \LaTeX 入门文档”。在使用前请先通读其他入门文档。
-	\item 针对Windows用户的额外需求：学位论文模本分别使用git和GNUMake进行版本控制和构建，建议从Cygwin\footnote{\url{http://cygwin.com}}安装这两个工具。
-\end{itemize}
+物联网这一概念出现至今已超过10年时间，然而仍然没有一个统一且明确的定义。
 
-\subsection{模板选项}
-\label{sec:thesisoption}
+1999年，MITAutoIDCenter给出了早期的“物联网”定义：在计算机互联网的基础上，利用RFID、无线数据通信等技术，构造一个覆盖世界上各种事物的网络（InternetofThings），以实现自动识别物品和互联共享信息。
 
-sjtuthesis提供了一些常用选项，在thesis.tex在导入sjtuthesis模板类时，可以组合使用。
-这些选项包括：
+2005年，国际电信联盟（ITU）发布的《ITU互联网报告2005：物联网》中正式给出了“物联网”概念并对扩展了其涵义，指出物联网是互联网应用的延伸，实现物联网的四大核心技术将是“RFID、传感器技术、纳米技术、智能嵌入技术”。
 
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-\item 学位类型：bachelor(学位)、master(硕士)、doctor(博士)，是必选项。
-\item 中国字体：adobefonts(Adobe中文字体)、winfonts(使用Windows下的中文字体，改选项未在Linux/Mac下测试)。
-\item 正文字号：cs4size(小四)、c5size(五号)。
-\item 盲审选项：使用review选项后，论文作者、学号、导师姓名、致谢、发表论文和参与项目将被隐去。
-\end{itemize}
+2009年9月，欧盟公布的一份CERPIoTSRA中，将“物联网”定义为：物联网将是未来互联网不可分割的一部分，是一个动态的全球网络架构，它具备基于一定的标准和互用的通信协议的自组织能力．其中物理的和虚拟的“物”均具有身份标识、物理属性和虚拟特性，并应用智能接口可以无缝链接到信息网络。
 
-\subsection{编译模板}
-\label{sec:process}
+自2009年IBM提出“智慧地球”这一概念后，物联网在全球掀起了一股浪潮，美国、欧洲、我国都把物联网作为战略发展计划。然而物联网的发展却仍只是停留在起步阶段，且不论上述的对于物联网这一概念都尚未有明确统一的定义，对于物联网中要用的标示码、各种标准各国之间哪怕是一个国家内的不同厂商也尚未达成一致，因此要有一个严格明确的物联网实际应用实验环境还早的很。现在市场上的物联网相关产品多数是车联网或者智能家居或者物流方面的相关应用，然而这距离物物相连、自动化处理仍很遥远，可以说物联网的现状仍然是处于制定标准阶段以及一些小范围的实验性产品。
 
-模板默认使用GNUMake构建，GNUMake将调用latemk工具自动完成模板多轮编译：
+\section{本文的研究意义和研究成果}
 
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={编译模板}, numbers=none]
-make clean thesis.pdf
-\end{lstlisting}
+Trivium算法作为一种新的算法，虽然得到了密码界的大量关注，但发表的对于Trivium算法的相关研究却并不多，其中更是几乎都是对于Trivium算法的攻击研究，而鲜有对Trivium算法的实际应用做研究探讨的。
 
-若需要生成包含“原创性声明扫描件”的学位论文文档，请将扫描件保存为statement.pdf，然后调用make生成submit.pdf。
+另外现在的物联网的研究很多都集中在研究分析物联网的发展方向或者体系结构，又或者是将各种现有系统套上物联网，然后研究是否可行或者有什么优劣，却鲜有研究物联网下的安全问题的，因此研究物联网下的密码算法是一项有意义的工作。另外现在的各种加密手段很多都是用RSA、AES、3DES这种，在互联网中，考虑到设备的计算能力，这些都可以接受，但是在物联网时代，是否所有物联网设备都支持就不得而知了，因此研究物联网下的轻量级密码算法Trivium算法是有意义的。
 
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={生成用于提交的学位论文}, numbers=none]
-make clean submit.pdf
-\end{lstlisting}
-
-编译失败时，可以尝试手动逐次编译，定位故障。
-
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={手动逐次编译}, numbers=none]
-xelatex -no-pdf thesis
-biber --debug thesis
-xelatex thesis
-xelatex thesis
-\end{lstlisting}
-
-\subsection{模板文件布局}
-\label{sec:layout}
-
-\begin{lstlisting}[basicstyle=\small\ttfamily,caption={模板文件布局},label=layout,float,numbers=none]
-├── LICENSE
-├── Makefile
-├── README.md
-├── bib
-│   └── thesis.bib
-├── figure
-│   ├── chap2
-│   │   ├── sjtulogo.eps
-│   │   ├── sjtulogo.jpg
-│   │   ├── sjtulogo.pdf
-│   │   └── sjtulogo.png
-│   └── sjtubanner.png
-├── sjtuthesis.cfg
-├── sjtuthesis.cls
-├── statement.pdf
-├── submit.pdf
-├── tex
-│   ├── abstract.tex
-│   ├── ack.tex
-│   ├── app_cjk.tex
-│   ├── app_eq.tex
-│   ├── app_log.tex
-│   ├── chapter01.tex
-│   ├── chapter02.tex
-│   ├── chapter03.tex
-│   ├── conclusion.tex
-│   ├── id.tex
-│   ├── patents.tex
-│   ├── projects.tex
-│   ├── pub.tex
-│   └── symbol.tex
-└── thesis.tex
-\end{lstlisting}
-
-本节介绍学位论文模板中木要文件和目录的功能。
-
-\subsubsection{格式控制文件}
-\label{sec:format}
-
-格式控制文件控制着论文的表现形式，包括两个文件： sjtuthesis.cfg, sjtuthesis.cls。
-
-\subsubsection{主控文件thesis.tex}
-\label{sec:thesistex}
-
-主控文件thesis.tex的作用就是将你分散在多个文件中的内容“整合”成一篇完整的论文。
-使用这个模板撰写学位论文时，你的学位论文内容和素材会被“拆散”到各个文件中：
-譬如各章正文、各个附录、各章参考文献等等。
-在thesis.tex中通过“include”命令将论文的各个部分包含进来，从而形成一篇结构完成的论文。
-对模板定制时引入的宏包，建议放在导言区。
-
-\subsubsection{各章源文件tex}
-\label{sec:thesisbody}
-
-这一部分是论文的主体，是以“章”为单位划分的，包括：
-
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-	\item 中英文摘要(abstract.tex)。前言(frontmatter)的其他部分，中英文封面、原创性声明、授权信息在sjtuthesis.cls中定义，不单独分离为tex文件。
-不单独弄成文件。
-	\item 正文(mainmatter)——学位论文正文的各章内容，源文件是chapter\emph{xxx}.tex。
-	\item 附录(app\emph{xx}.tex)、致谢(thuanks.tex)、攻读学位论文期间发表的学术论文目录(pub.tex)、个人简历(resume.tex)组成正文后的部分(backmatter)。
-参考文献列表由biber插入，不作为一个单独的文件。
-\end{itemize}
-
-\subsubsection{图片文件夹figure}
-\label{sec:fig}
-
-figure文件夹放置了需要插入文档中的图片文件(支持PNG/JPG/PDF/EPS格式的图片)，可以在按照章节划分子目录。
-模板文件中使用\verb|\graphicspath|命令定义了图片存储的顶层目录，在插入图片时，顶层目录名“figure”可省略。
-
-\subsubsection{参考文献数据库bib}
-\label{sec:bib}
-
-目前参考文件数据库目录只存放一个参考文件数据库thesis.bib。
-关于参考文献引用，可参考第\ref{chap:example}章中的例子。
-
+本文的创新工作在于计算了与Trivium算法相似结构的Trivium型算法的内部状态位数的下限，另外给出了构造能产生小周期的初始内部状态的方法。以及提出了将Trivium算法应用到物联网场景下的设计想法。
