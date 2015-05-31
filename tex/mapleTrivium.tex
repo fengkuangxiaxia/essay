@@ -1,0 +1,30 @@
+%% Created by Maple 2015.0, Windows 7
+%% Source Worksheet: trivium.mw
+%% Generated: Sun May 31 20:20:38 CST 2015
+\documentclass{article}
+\usepackage{maplestd2e}
+\def\emptyline{\vspace{12pt}}
+\begin{document}
+\pagestyle{empty}
+\DefineParaStyle{Maple Heading 1}
+\DefineParaStyle{Maple Text Output}
+\DefineParaStyle{Maple Dash Item}
+\DefineParaStyle{Maple Bullet Item}
+\DefineParaStyle{Maple Normal}
+\DefineParaStyle{Maple Heading 4}
+\DefineParaStyle{Maple Heading 3}
+\DefineParaStyle{Maple Heading 2}
+\DefineParaStyle{Maple Warning}
+\DefineParaStyle{Maple Title}
+\DefineParaStyle{Maple Error}
+\DefineCharStyle{Maple Hyperlink}
+\DefineCharStyle{Maple 2D Math}
+\DefineCharStyle{Maple Maple Input}
+\DefineCharStyle{Maple 2D Output}
+\DefineCharStyle{Maple 2D Input}
+\begin{maplegroup}
+\begin{mapleinput}
+\mapleinline{active}{2d}{restart; 1; with(linalg); 1; for w1 to 6 do for w2 from w1+1 to 7 do for w3 from w2+1 to 8 do for w4 from w3+1 to 9 do for w5 from w4+1 to 10 do for w6 from w5+1 to 11 do for w7 from w6+1 to 12 do for w8 from w7+1 to 13 do for w9 from w8+1 to 14 do w := [w1, w2, w3, w4, w5, w6, w7, w8, w9]; A := Matrix(3*w[9]); A[1, 3*w[9]] := 1; for i from 2 to 3*w[9] do A[i, i-1] := 1 end do; A[3*w[3]+1, 3*w[1]] := 1; A[3*w[3]+1, 3*w[5]] := 1; A[3*w[6]+1, 3*w[4]] := 1; A[3*w[6]+1, 3*w[8]] := 1; A[1, 3*w[2]] := 1; A[1, 3*w[7]] := 1; f := `mod`(charpoly(A, x), 2); if `mod`(Divide(f, (x^3+1)^3, 'g'), 2) then g := algsubs(x^3 = x, g); if `mod`(Primitive(g), 2) then printf("%d,%d,%d,%d,%d,%d,%d,%d,%d\n", w[1], w[2], w[3], w[4], w[5], w[6], w[7], w[8], w[9]) end if end if end do end do end do end do end do end do end do end do end do; 1}{\[\]}
+\end{mapleinput}
+\end{maplegroup}
+\end{document}
