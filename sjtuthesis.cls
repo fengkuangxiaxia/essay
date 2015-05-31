@@ -77,7 +77,7 @@
 %==========
 
 \setcounter{secnumdepth}{4}  % 章节编号深度 (part 对应 -1)
-\setcounter{tocdepth}{2}     % 目录深度 (part 对应 -1)
+\setcounter{tocdepth}{4}     % 目录深度 (part 对应 -1)
     
 % User defined command list
 %% \me \mi \mj \dif \cleardoublepage \cndash \CJKLaTeX
