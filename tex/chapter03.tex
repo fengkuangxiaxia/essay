@@ -62,7 +62,7 @@ RIFD标签分为有源和无源两种，无源RFID标签依靠RFID阅读器发�
 
 基本的RFID安全协议有Hash-Lock协议、随机化的Hash-Lock协议、Hash链协议、基于Hash的ID变化协议、David的数字图书馆RFID协议、分布式RFID询问-应答认证协议、LCAP
 
-\\
+\[\]
 
 Hash-Lock协议原理如图\ref{fig:Hash-Lock协议图示}所示。
 
@@ -86,7 +86,7 @@ Hash-Lock协议原理如图\ref{fig:Hash-Lock协议图示}所示。
 
 7)阅读器将标签与后台应用系统发来的两个ID对比，如果相同则验证成功
 
-\\
+\[\]
 
 随机化Hash-Lock协议原理如图\ref{fig:随机化Hash-Lock协议图示}所示。
 
@@ -108,7 +108,7 @@ Hash-Lock协议原理如图\ref{fig:Hash-Lock协议图示}所示。
 
 6)标签收到$ID_{j}$后，看是否与与自身的$ID_{i}$相同，若相同则验证成功
 
-\\
+\[\]
 
 Hash链协议原理如图\ref{fig:Hash链协议图示}所示。
 
@@ -126,7 +126,7 @@ Hash链协议原理如图\ref{fig:Hash链协议图示}所示。
 
 4)后台应用系统查找数据库搜索存储的所有标签，计算是否有某个标签的ID$_{t}$使得H(K$_{t}$,J)=G(H$^{J-1}$(K$_{t}$,1))，若有，认证通过，并把ID$_{t}$发送给电子标签。否则认证失败。
 
-\\
+\[\]
 
 基于Hash的ID变化协议原理如图\ref{fig:基于Hash的ID变化协议图示}所示。
 
@@ -146,7 +146,7 @@ Hash链协议原理如图\ref{fig:Hash链协议图示}所示。
 
 5)阅读器收到后再发给标签，标签收到后验证，如果通过则更新自己的ID和LST。
 
-\\
+\[\]
 
 David的数字图书馆RFID协议原理如图\ref{fig:David的数字图书馆RFID协议图示}所示。
 
@@ -166,7 +166,7 @@ David的数字图书馆RFID协议原理如图\ref{fig:David的数字图书馆RFI
 
 5)阅读器收到后再发给标签，标签收到后验证是否满足ID=$b+ID_{i}+H_{k}(1,R_{R},R_{T})$，如果满足则认证成功。
 
-\\
+\[\]
 
 分布式RFID询问-应答认证协议原理如图\ref{fig:分布式RFID询问-应答认证协议图示}所示。
 
@@ -186,7 +186,7 @@ David的数字图书馆RFID协议原理如图\ref{fig:David的数字图书馆RFI
 
 5)阅读器收到后再发给标签，标签收到后验证是否满足$H(ID_{j}||R_{T})=H(ID||R_{T})$，如果满足则认证成功。
 
-\\
+\[\]
 
 LCAP协议原理如图\ref{fig:LCAP协议图示}所示。
 
@@ -206,7 +206,7 @@ LCAP协议原理如图\ref{fig:LCAP协议图示}所示。
 
 5)阅读器收到后再发给标签，标签收到后验证有效性，如果成功则认证成功。
 
-\\
+\[\]
 
 根据网上资料\parencite{射频技术（RFID）的安全协议}，这些基本的RFID协议的安全性如表\ref{tab:基本的RFID安全协议安全性分析}所示、性能如如表\ref{tab:基本的RFID安全协议性能分析}所示。
 
@@ -332,44 +332,45 @@ LCAP协议原理如图\ref{fig:LCAP协议图示}所示。
 
 (1)首先建立基本模型，在本基本模型中，将后台应用系统与阅读器合并作为一个主体A，将标签作为主体B:
 
-1)A \rightarrow B: A向B发送认证请求{query, $N_{a}$}
+1)A $\rightarrow$ B: A向B发送认证请求{query, $N_{a}$}
 
-2)B \rightarrow A: B向A发送${ID_{T}, N_{a}}_{Trivium}$作为应答，其中Trivium为A与B之间共享的的秘密
+2)B $\rightarrow$ A: B向A发送${ID_{T}, N_{a}}_{Trivium}$作为应答，其中Trivium为A与B之间共享的的秘密
 
 3)A: A收到${ID_{T}, N_{a}}_{Trivium}$后对B进行身份认证查看其合法性，如果认证通过则转到第(4)步，否则认证失败停止
 
-4)A \rightarrow B: A向B发送${ID_{V}, N_{a}}_{Trivium}$，其中Trivium为A与B之间共享的的秘密
+4)A $\rightarrow$ B: A向B发送${ID_{V}, N_{a}}_{Trivium}$，其中Trivium为A与B之间共享的的秘密
 
 5)B: B收到${ID_{V}, N_{a}}_{Trivium}$后对A进行身份认证查看其合法性，如果认证失败则停止，否则认证通过
 
-\\
+\[\]
 
 (2)Ban理想化模型：
 
-B \rightarrow A: ${ID_{T}, N_{a}}_{Trivium}$
+B $\rightarrow$ A: ${ID_{T}, N_{a}}_{Trivium}$
 
-A \rightarrow B: ${ID_{V}, N_{a}}_{Trivium}$
-\\
+A $\rightarrow$ B: ${ID_{V}, N_{a}}_{Trivium}$
+
+\[\]
 
 (3)假定：
 
-A believes A \xleftrightarrow{Trivium} B \\
-B believes A \xleftrightarrow{Trivium} B \\
+A believes A $\xleftrightarrow{Trivium}$ B \\
+B believes A $\xleftrightarrow{Trivium}$ B \\
 A believes fresh($N_{a}$) \\
 B believes fresh($N_{a}$) \\
-A believes (B controls A \xleftrightarrow{$ID_{T}$} B) \\
-B believes (A controls A \xleftrightarrow{$ID_{V}$} B) \\
+A believes (B controls A $\xleftrightarrow{ID_{T}}$ B) \\
+B believes (A controls A $\xleftrightarrow{ID_{V}}$ B) \\
 
-\\
+\[\]
 
 (4)推理
 
 A sees ${ID_{T}, N_{a}}_{Trivium}$ \\
-由A believes A \xleftrightarrow{Trivium} B 及 P sees(X, Y) \rightarrow P sees(X) 及 P believes Q \xleftrightarrow{K} P, P sees ${X}_{K}$ \rightarrow P believes Q said X \\
+由A believes A $\xleftrightarrow{Trivium}$ B 及 P sees(X, Y) $\rightarrow$ P sees(X) 及 P believes Q $\xleftrightarrow{K}$ P, P sees ${X}_{K}$ $\rightarrow$ P believes Q said X \\
 可推出A believes B said {$ID_{T}, N_{a}$} 及 A believes B said $ID_{T}$\\
-由A believes fresh($N_{a}$) 及 P believes fresh(X) \rightarrow P believes fresh(X,Y) \\
+由A believes fresh($N_{a}$) 及 P believes fresh(X) $\rightarrow$ P believes fresh(X,Y) \\
 可推出A believes fresh($ID_{T}$)\\
-由P believes fresh(X), P believes Q said X \rightarrow P believes Q believes X \\
+由P believes fresh(X), P believes Q said X $\rightarrow$ P believes Q believes X \\
 可推出A believes B believes $ID_{T}$ \\
 同理可推出B believes A believes $ID_{V}$
 
