@@ -3,57 +3,511 @@
 %% Encoding: UTF-8
 %%==================================================
 
-\chapter{Trivium算法}
-\label{chap:Trivium}
+\chapter{Trivium流密码算法}
 
-\begin{algorithm}
-	\caption{Trivium算法最小阶数计算}
-	\label{algo:trivium_maple}
-	\begin{algorithmic}
-		
-		\FOR {$w1 \leftarrow 1$ \TO $6$}
-			\FOR {$w2 \leftarrow (w1 + 1)$ \TO $7$}
-				\FOR {$w3 \leftarrow (w2 + 1)$ \TO $8$}
-					\FOR {$w4 \leftarrow (w3 + 1)$ \TO $9$}
-						\FOR {$w5 \leftarrow (w4 + 1)$ \TO $10$}
-							\FOR {$w6 \leftarrow (w5 + 1)$ \TO $11$}
-								\FOR {$w7 \leftarrow (w6 + 1)$ \TO $12$}
-									\FOR {$w8 \leftarrow (w7 + 1)$ \TO $13$}
-										\FOR {$w9 \leftarrow (w8 + 1)$ \TO $14$}			
-											\STATE {$(w_{1}, w_{2}, \ldots, w_{9}) \leftarrow (w1, w2, \ldots, w9)$}
-											\STATE $A \leftarrow Matrix(w_{9}*3)$
-											\STATE $A[1][w_{9}*3] \leftarrow 1$
-											\FOR {$i \leftarrow 2$ \TO $(w_{9} * 3)$}
-												\STATE $A[i][i - 1] \leftarrow 1$
-											\ENDFOR	
-											\STATE $A[3*w_{3}+1][3*w_{1}] \leftarrow 1$
-											\STATE $A[3*w_{3}+1][3*w_{5}] \leftarrow 1$
-											\STATE $A[3*w_{6}+1][3*w_{4}] \leftarrow 1$
-											\STATE $A[3*w_{6}+1][3*w_{8}] \leftarrow 1$
-											\STATE $A[1][3*w_{2}] \leftarrow 1$
-											\STATE $A[1][3*w_{7}] \leftarrow 1$
-											\STATE $f \leftarrow charpoly(A, x) mod \quad 2$
-											\IF {$Divide(f,(x^{3}+1)^{3},'g') mod \quad 2$}
-												\STATE $g \leftarrow algsubs(x^{3}=x, g)$
-												\IF {$Primitive(g) mod \quad 2$}
-													\STATE $output(w)$
-												\ENDIF
-											\ENDIF
-										\ENDFOR
-									\ENDFOR
-								\ENDFOR
-							\ENDFOR
-						\ENDFOR
-					\ENDFOR
-				\ENDFOR
-			\ENDFOR
-		\ENDFOR
-		
-	\end{algorithmic}
+\section{标准的Trivium流密码算法}
+
+由Christophe De 和 Bart Preneel设计的标准Trivium算法共有288个内部状态位，这288位内部状态的每一次更新构成了了Trivium算法生成密钥流中一位密钥的生成来源， Trivium算法的具体应用步骤如下：
+
+\begin{enumerate}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+  \item 密钥分配阶段：用户通过事先定义或者协商得到密钥K和初始向量IV。
+  \item 初始化阶段：将密钥K和初始向量IV装填入Trivium的288位的内部状态中，并运行几轮Trivium算法更新内部状态。
+  \item 密钥流生成阶段：每运行一轮Trivium，更新内部状态并生成一位密钥输出。
+\end{enumerate}
+
+下面对每个阶段的具体步骤进行详细描述。
+
+\subsection{Trivium算法内部状态的初始化}
+Trivium算法内部状态的初始化，可以用以下步骤描述：
+\begin{enumerate}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+  \item 将Trivium的内部状态分为3个部分，第一部位为1到93位，第二部分为94到177位，第三部分为178到288位
+  \item 将80比特的密钥装填入第一部分的前80位即1到80位，并将第一部分的其他位置0，即81到93位置0
+  \item 将80比特的初始向量装填入第二部分的前80位即94到173位，并将第二部分的其他位置0，即174到177位置0
+  \item 将第三部分的后3位置1，即286到288位置1，并将第三部分的其他位置0，即178到285位置0
+  \item 运行 4*288=1152 轮Trivium算法更新内部状态
+\end{enumerate}
+
+可以使用伪代码算法\ref{algo:trivium_intialize}表示这个过程：
+
+\begin{algorithm}[H]
+\caption{Trivium算法内部状态初始化过程}
+\label{algo:trivium_intialize}
+\begin{algorithmic}
+
+  \STATE {$(S_{1}, S_{2},\ldots, S_{93}) \leftarrow (K_{1}, K_{2}, \ldots, K_{80}, 0, \ldots, 0)$}
+  \STATE {$(S_{94}, S_{2},\ldots, S_{177}) \leftarrow (IV_{1}, IV_{2}, \ldots, IV_{80}, 0, \ldots, 0)$}
+  \STATE {$(S_{178}, S_{2},\ldots, S_{288}) \leftarrow (0, \ldots, 0, 1, 1, 1)$}
+  \FOR {$i \leftarrow 1$ \TO $1152$}
+    \STATE {$T_{1} \leftarrow S_{66} + S_{93} + S_{91} * S_{92} + S_{171}$}
+    \STATE {$T_{2} \leftarrow S_{162} + S_{177} + S_{175} * S_{174} + S_{264}$}
+    \STATE {$T_{3} \leftarrow S_{243} + S_{288} + S_{286} * S_{287} + S_{69}$}
+    \FOR {$j \leftarrow 2 $\TO $288$}
+     \STATE {$S_{j} \leftarrow S_{j-1}$}
+    \ENDFOR
+    \STATE {$S_{1} \leftarrow T_{3}$}
+    \STATE {$S_{94} \leftarrow T_{1}$}
+    \STATE {$S_{178} \leftarrow T_{2}$}
+  \ENDFOR
+
+\end{algorithmic}
 \end{algorithm}
+
+
+
+\subsection{Trivium算法密钥流的生成}
+Trivium算法的密钥流生成的过程与Trivium算法的初始化过程基本是完全一致的，唯一的区别在于除了要更新Trivium的内部状态之外，每轮还需要使用6位内部状态位来生成密钥比特。
+
+可以使用伪代码算法\ref{algo:trivium_generate}表示这个过程：
+
+\begin{algorithm}[H]
+\caption{Trivium算法密钥流的生成过程}
+\label{algo:trivium_generate}
+\begin{algorithmic}
+  \FOR {$i \leftarrow 1$ \TO $N$}
+    \STATE {$R_{1} \leftarrow S_{66} + S_{93}$}
+    \STATE {$R_{2} \leftarrow S_{162} + S_{177}$}
+    \STATE {$R_{3} \leftarrow S_{243} + S_{288}$}
+    \STATE {$Z \leftarrow R_{1} + R_{2} + R_{3}$}
+    \STATE {$T_{1} \leftarrow R_{1} + S_{91} * S_{92} + S_{171}$}
+    \STATE {$T_{2} \leftarrow R_{2} + S_{175} * S_{174} + S_{264}$}
+    \STATE {$T_{3} \leftarrow R_{3} + S_{286} * S_{287} + S_{69}$}
+    \FOR {$j \leftarrow 2 $\TO $288$}
+     \STATE {$S_{j} \leftarrow S_{j-1}$}
+    \ENDFOR
+    \STATE {$S_{1} \leftarrow T_{3}$}
+    \STATE {$S_{94} \leftarrow T_{1}$}
+    \STATE {$S_{178} \leftarrow T_{2}$}
+  \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Trivium算法的硬件实现}
 
 \begin{figure}[!htp]
 	\centering
-	\includegraphics[width=\textwidth]{chap2/mapleTrivium.pdf}
-	\caption{Trivium算法最小阶数计算}\label{fig:trivium_maple}
+	\includegraphics[width=\textwidth]{chap2/hardwareTrivium.png}
+	\caption{Trivium算法的硬件实现}\label{fig:Trivium算法的硬件实现}
 \end{figure}
+
+\section{Trivium流密码算法的结构}
+
+传统的流密码算法仅有线性移位反馈寄存器实现，因此传统的流密码算法都可以将其表示为一个状态转移矩阵的形式，即存在状态转移矩阵A使$(s_{1}, s_{2}, \ldots, s_{n})^{T}$ = $A_{n*n}$ * $(s_{1}, s_{2}, \ldots, s_{n})^{T}$，然后将状态转移矩阵转化为一个特征多项式进行研究，而Trivium算法除了传统的线性移位反馈寄存器外，还含有三个非线性移位反馈寄存器，因此很难找到一个简单合适的方法将其表示成一个状态转移矩阵或者特征多项式，为了研究方便，本节将先从Trivium算法的线性部分如何，研究Trivium算法的线性部分的结构。
+
+\subsection{Trivium流密码算法的线性部分的状态转移矩阵}
+
+对于仅基于线性移位反馈寄存器的流密码，将其表述成一个状态转移矩阵是一件简单的事，并且通过状态转移矩阵或通过状态转移矩阵得到的特征多项式可以有效地分析密码的性质。虽然Trivium算法包含非线性移位反馈寄存器的部分，但在算法\ref{algo:trivium_intialize}中可以发现$S_{66} + S_{93} + S_{91} * S_{92} + S_{171}$、$S_{162} + S_{177} + S_{175} * S_{174} + S_{264}$、$S_{243} + S_{288} + S_{286} * S_{287} + S_{69}$}是Trivium算法中的主要部分，且可以拆成线性部分和非线性部分的组合，形成如$(s_{1}, s_{2}, \ldots, s_{n})^{T}$ = $A_{n*n}$ * $(s_{1}, s_{2}, \ldots, s_{n})^{T}$ + $(w_{1}, w_{2}, \ldots, w_{n})^{T}$的形式。
+
+对于Trivium算法的线性部分，我们可以得到如下方程：
+
+令
+\begin{align}
+\label{eq:struct_A}
+& A = \left(
+\begin{array}{@{}*{6}{c}@{}}
+0 & 0 & 0 & \cdots & 0 & 0 \\
+1 & 0 & 0 & \cdots & 0 & 0 \\
+0 & 1 & 0 & \cdots & 0 & 0 \\
+\vdots & & \ddots & & & \vdots \\
+\vdots & & & \ddots & & \vdots \\
+0 & 0 & 0 & \cdots & 1 & 0 \\
+\end{array}
+\right)+\left(
+\begin{array}{@{}*{9}{c}@{}}
+0 & \cdots & 1_{(1,69)} & \cdots & 1_{(1,243)} & \cdots & \cdots & \cdots & 1_{(1,288)} \\
+0 & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & 0 \\
+\vdots & & & & & & & & \vdots \\
+0 & \cdots & 1_{(94,66)} & \cdots & 1_{(94,93)} & \cdots & 1_{(94,171)} & \cdots & 0 \\
+\vdots & & & & & & & & \vdots \\
+0 & \cdots & 1_{(178,162)} & \cdots & 1_{(178,177)} & \cdots & 1_{(178,264)} & \cdots & 0 \\
+\vdots & & & & & & & & \vdots \\
+0 & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & 0 \\
+\end{array}
+\right)
+\end{align}
+
+\begin{align}
+\label{eq:struct_S}
+& S = \left(
+\begin{array}{@{}*{6}{c}@{}}
+S_{1} \\
+S_{2} \\
+\vdots \\
+S_{288} \\
+\end{array}
+\right)
+\end{align}
+
+\begin{align}
+\label{eq:struct_C}
+& C = \left(
+\begin{array}{@{}*{6}{c}@{}}
+S_{226} * S_{227} \\
+\vdots \\
+S_{91} * S_{92} \\
+\vdots \\
+S_{175} * S_{176} \\
+\vdots \\
+0 \\
+\end{array}
+\right)
+\end{align}
+
+从而有：
+\begin{align}
+\label{eq:struct}
+& S = A \cdot S + C
+\end{align}
+
+从上述的的一系列的等式中，A是状态转移的线性部分，C是非线性部分，S是288位移位寄存器，A赋值等式右边的第一项代表了Trivium算法的位移过程，而A赋值等式右边的第二项代表了Trivium算法的替换更新过程。
+
+\subsection{Trivium型算法的定义}
+
+\subsubsection{Trivium算法的线性部分的状态转移矩阵的特征多项式}
+
+进一步研究Trivium算法的线性部分的状态转移矩阵即A，首先可以计算在模2域上状态转移矩阵A所对应的特征多项式，由状态转移矩阵计算特征多项式的方法为计算|A-xI|的值，其中I为单位矩阵。
+
+计算状态转移矩阵A所对应的特征多项式可分为手工计算和程序实现两种方案。首先介绍手工计算的大致思路，首先如果忽略线性部分中$S_{66} + S_{93} + S_{171}$、$S_{162} + S_{177} + S_{264}$、$S_{243} + S_{288} + S_{69}$这三部分，那么很容易得知此时的状态转移矩阵A除了所有$A_{(i,i-1)}$(包括$A_{(1,288)}$)为1外，其他全部为0，此时可以较轻易计算出状态转移矩阵对应的特征多项式。同时，可以注意到忽略的三部分，其实影响的仅为状态转移矩阵中的6位，即仍有6位需要置1，此时可以通过逐渐将这6个1填回状态转移矩阵中，然后通过矩阵的分解展开逐步计算每次添加1个1后新的状态转移矩阵对应的特征多项式。
+
+可见上述方法计算起来十分复杂，并且要将这种方法转为通用的计算程序也并不容易。因此本文著者在研究中采用通过以下Maple程序代码，j计算Trivium算法对应的状态转移矩阵A并计算该状态转移矩阵A对应的特征多项式：
+
+\begin{algorithm}[H]
+  \caption{Maple计算特征多项式}
+  \label{algo:trivium_maple_function}
+  \begin{algorithmic}
+      
+	  \STATE {$(w_{1}, w_{2}, \ldots, w_{9}) \leftarrow (22, 23, 31, 54, 57, 59, 81, 88, 96)$}
+	  \STATE $A \leftarrow Matrix(w_{9}*3)$
+	  \STATE $A[1][w_{9}*3] \leftarrow 1$
+	  \FOR {$i \leftarrow 2$ \TO $(w_{9} * 3)$}
+	    \STATE $A[i][i - 1] \leftarrow 1$
+	  \ENDFOR 
+	  \STATE $A[3*w_{3}+1][3*w_{1}] \leftarrow 1$
+	  \STATE $A[3*w_{3}+1][3*w_{5}] \leftarrow 1$
+	  \STATE $A[3*w_{6}+1][3*w_{4}] \leftarrow 1$
+	  \STATE $A[3*w_{6}+1][3*w_{8}] \leftarrow 1$
+	  \STATE $A[1][3*w_{2}] \leftarrow 1$
+	  \STATE $A[1][3*w_{7}] \leftarrow 1$
+	  \STATE $f \leftarrow charpoly(A, x) mod \quad 2$
+
+  \end{algorithmic}
+\end{algorithm}
+
+Maple计算得到的结果可以得到Trivium算法的特征多项式为
+
+\[\begin{split}
+f(x)&=x^{288}+x^{219}+x^{210}+x^{201}+x^{141}+x^{132}+x^{123}\\
+&+x^{87}+x^{72}+x^{60}+x^{54}+x^{45}+x^{42}+x^{27}+x^{15}+1\\
+\end{split}\]
+\begin{equation}
+\label{eq:feature_polynom}
+\end{equation}
+
+\subsubsection{Trivium算法的特征多项式中的$(x+1)^3$因子}
+
+在计算出Trivium算法线性部分对应的状态转移矩阵的特征多项式后，我们继续深入研究式（\ref{eq:feature_polynom_param}）的整除性，为之后引入Trivium型算法做准备。
+
+\begin{algorithm}[H]
+  \caption{Maple计算特征多项式}
+  \label{algo:trivium_maple_function}
+  \begin{algorithmic}
+      
+	   \STATE $f \leftarrow x^{288}+x^{219}+x^{210}+x^{201}+x^{141}+x^{132}+x^{123}+x^{87}+x^{72}+x^{60}+x^{54}+x^{45}+x^{42}+x^{27}+x^{15}+1$
+       \STATE $Divide(f,(x+1)^{3},'g') mod \quad 2$
+
+  \end{algorithmic}
+\end{algorithm}
+
+由上述代码的结果可以发现$(x+1)^3|f(x)$。
+
+
+进一步分析特征多项式的特点，还能得到一个更强的结论。
+
+\begin{algorithm}[H]
+  \caption{Maple计算特征多项式}
+  \label{algo:trivium_maple_function}
+  \begin{algorithmic}
+      
+	   \STATE $f \leftarrow x^{288}+x^{219}+x^{210}+x^{201}+x^{141}+x^{132}+x^{123}+x^{87}+x^{72}+x^{60}+x^{54}+x^{45}+x^{42}+x^{27}+x^{15}+1$
+       \STATE $Divide(f,(x^{3}+1)^{3},'g') mod \quad 2$
+
+  \end{algorithmic}
+\end{algorithm}
+
+由上述代码的结果可以发现$(x^3+1)^3|f(x)$。
+
+\subsubsection{Trivium算法的特征多项式中的本原多项式}
+
+从上述对Trivium算法的整数性分析，可以发现标准Trivium流密码算法的特征多项可以在模2域上因式分解，并可以得到下列等式：
+\[\begin{split}
+\frac{g(x)}{(x+1)^3}=&x^{93}+x^{92}+x^{89}+x^{88}+x^{85}+x^{84}+x^{81}\\
+&+x^{80}+x^{77}+x^{76}+x^{73}+x^{72}+x^{70}+x^{68}+x^{67}+x^{44}+x^{43}\\
+&+x^{41}+x^{39}+x^{38}+x^{35}+x^{34}+x^{31}+x^{30}+x^{27}+x^{25}+x^{23}\\
+&+x^{20}+x^{19}+x^{17}+x^{14}+x^{13}+x^{12}+x^9+x^8+x^6+x^4+x+1\\
+f(x)=&(x^3+1)^3g(x^3)
+\end{split}\]
+\begin{equation}
+\label{eq:trivium_expand}
+\end{equation}
+
+式（\ref{eq:trivium_expand}）中h(x)为GF(2)上的93次本原多项式。由此我们可以将Trivium算法参数化并给出Trivium型算法的定义：
+\begin{defn}[Trivium型算法的定义]
+\label{defn:trivium}
+
+算法形如（\ref{algo:trivium_generate_param}）
+
+\begin{algorithm}[H]
+\caption{Trivium型算法}
+\label{algo:trivium_generate_param}
+\begin{algorithmic}
+  \FOR {$i \leftarrow 1$ \TO $N$}
+    \STATE {$R_{1} \leftarrow S_{3*\omega[1]} + S_{3*\omega[3]}$}
+    \STATE {$R_{2} \leftarrow S_{3*\omega[4]} + S_{3*\omega[6]}$}
+    \STATE {$R_{3} \leftarrow S_{3*\omega[7]} + S_{3*\omega[9]}$}
+    \STATE {$Z \leftarrow R_{1} + R_{2} + R_{3}$}
+    \STATE {$T_{1} \leftarrow R_{1} + S_{3*\omega[3]-2} * S_{3*\omega[3]-1} + S_{3*\omega[5]}$}
+    \STATE {$T_{2} \leftarrow R_{2} + S_{3*\omega[6]-2} * S_{3*\omega[6]-1} + S_{3*\omega[8]}$}
+    \STATE {$T_{3} \leftarrow R_{3} + S_{3*\omega[9]-2} * S_{3*\omega[9]-1} + S_{3*\omega[2]}$}
+    \STATE {$Z  \leftarrow T_{1} + T_{2 } + T_{3}$}
+    \FOR {$j \leftarrow 2 $\TO $3*\omega[9]$}
+     \STATE {$S_{j} \leftarrow S_{j-1}$}
+    \ENDFOR
+    \STATE {$S_{1} \leftarrow T_{3}$}
+    \STATE {$S_{3*\omega[3]+1} \leftarrow T_{1}$}
+    \STATE {$S_{3*\omega[6]+1} \leftarrow T_{2}$}
+  \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+其中$\omega = (\omega[1], \omega[2], \ldots, \omega[9])$，且$\omega[1] < \omega[2] < \ldots < \omega[9]$，共$3*\omega[9]$位内部状态，由此得到的线性部分对应的状态转移矩阵的特征多项式为f(x)，如果f(x)可表示为$(x^{3}+1)^{3}g(x^{3})$的形式，并且g(x)为模2域上的本原多项式，那么定义这个算法为Trivium型算法。
+
+\end{defn}
+
+\section{Trvium算法的安全性}
+根据Trvium型算法的定义（\ref{defn:trivium}）,可知本原多项式是Trivium算法的安全基础，正是由于本原多项式使得Trivium算法在理论上的线性部分的周期很大，然后Trivium算法作者声称通过引入非线性部分，周期总是能大于线性部分周期以此保证Trivium算法的大周期导致的安全性。因此本节将通过研究Trivium算法的周期考察其安全性。
+
+\subsection{Trivium型算法的本原多项式的最小次数}
+标准的Trivium算法建立在式（\ref{eq:trivium_expand}）的本原多项式上，该本原多项式的最高次数为93，多项式指数（Polynomial Order）为93，光线性部分的周期就非常大了，因此不便于作深入的分析研究。根据定义（\ref{defn:trivium}可知Trivium型算法可以通过降低本原多项式的的次数降低线性部分的周期进而可能降低整体周期，假设已知本原多项式g(x)，在保证g(x)的最高次数尽可能低的前提下，计算$f(x)=(x^{3}+1)^{3}g(x^{3})$，然后通过f(x)还原出除$A_{(i,i-1)}$外仅有6个位置为1的状态转移矩阵A，再根据状态转移矩阵A求解$\omega_{1},\omega_{2},\cdots,\omega_{9}$，从上述描述就可知直接根据g(x)求解$\omega_{1},\omega_{2},\cdots,\omega_{9}$是非常困难的。但可以反其道而行，通过遍历$\omega_{1},\omega_{2},\cdots,\omega_{9}$，从而推导出对应的特征多项式f(x)，然后先检查其能否表示成$f(x)=(x^{3}+1)^{3}g(x^{3})$的形式，如果能再检查g(x)是否是本原多项式，再在其中找出最高次数最低的g(x)是一个可行的方案。在Maple上本文著者通过以下代码运行出了Trivium型算法的最小的本原多项式次数：
+
+\begin{algorithm}[H]
+  \caption{Trivium算法最小阶数计算}
+  \label{algo:trivium_maple}
+  \begin{algorithmic}
+    
+    \FOR {$w1 \leftarrow 1$ \TO $6$}
+      \FOR {$w2 \leftarrow (w1 + 1)$ \TO $7$}
+        \FOR {$w3 \leftarrow (w2 + 1)$ \TO $8$}
+          \FOR {$w4 \leftarrow (w3 + 1)$ \TO $9$}
+            \FOR {$w5 \leftarrow (w4 + 1)$ \TO $10$}
+              \FOR {$w6 \leftarrow (w5 + 1)$ \TO $11$}
+                \FOR {$w7 \leftarrow (w6 + 1)$ \TO $12$}
+                  \FOR {$w8 \leftarrow (w7 + 1)$ \TO $13$}
+                    \FOR {$w9 \leftarrow (w8 + 1)$ \TO $14$}      
+                      \STATE {$(w_{1}, w_{2}, \ldots, w_{9}) \leftarrow (w1, w2, \ldots, w9)$}
+                      \STATE $A \leftarrow Matrix(w_{9}*3)$
+                      \STATE $A[1][w_{9}*3] \leftarrow 1$
+                      \FOR {$i \leftarrow 2$ \TO $(w_{9} * 3)$}
+                        \STATE $A[i][i - 1] \leftarrow 1$
+                      \ENDFOR 
+                      \STATE $A[3*w_{3}+1][3*w_{1}] \leftarrow 1$
+                      \STATE $A[3*w_{3}+1][3*w_{5}] \leftarrow 1$
+                      \STATE $A[3*w_{6}+1][3*w_{4}] \leftarrow 1$
+                      \STATE $A[3*w_{6}+1][3*w_{8}] \leftarrow 1$
+                      \STATE $A[1][3*w_{2}] \leftarrow 1$
+                      \STATE $A[1][3*w_{7}] \leftarrow 1$
+                      \STATE $f \leftarrow charpoly(A, x) mod \quad 2$
+                      \IF {$Divide(f,(x^{3}+1)^{3},'g') mod \quad 2$}
+                        \STATE $g \leftarrow algsubs(x^{3}=x, g)$
+                        \IF {$Primitive(g) mod \quad 2$}
+                          \STATE $output(w)$
+                        \ENDIF
+                      \ENDIF
+                    \ENDFOR
+                  \ENDFOR
+                \ENDFOR
+              \ENDFOR
+            \ENDFOR
+          \ENDFOR
+        \ENDFOR
+      \ENDFOR
+    \ENDFOR
+    
+  \end{algorithmic}
+\end{algorithm}
+
+算法（\ref{algo:trivium_maple}）中的9个嵌套的For循环将会遍历1到14中所有的9个参数的取值，由于有$\omega_{1}<\omega_{2}<\cdots<\omega_{9}$这一约束条件，所以其计算量会缩减为$6^9$个处理级别，是一个可以接受的范围，因为以本文作者普通的笔记本电脑（CPU：i5 2410，内存 4GB）的运算能力运行时间接近1800秒。最后，Maple运算的结果如下表所示：
+
+\begin{table}[!hpb]
+  \label{table:trivium_minimal}
+  \centering
+  \caption{Trivium型算法对应的本原多项式最高次数最小的参数}
+  \begin{tabular}{@{}llr@{}} \toprule
+    $\omega_{1},\omega_{2},\cdots,\omega_{9}$ & 本原多项式 \\ 
+    \midrule
+    1,2,4,5,6,8,9,10,14 & $1+x+x^{4}+x^{7}+x^{9}+x^{10}+x^{11}$ \\
+    1,2,4,5,6,8,11,13,14 & $1+x+x^{3}+x^{10}+x^{11}$ \\
+    1,2,4,5,6,10,11,12,14 & $1+x+x^{4}+x^{7}+x^{9}+x^{10}+x^{11}$ \\
+    1,2,4,6,8,9,11,13,14 & $1+x+x^{3}+x^{4}+x^{7}+x^{8}+x^{9}+x^{10}+x^{11}$ \\
+    1,2,4,7,9,10,11,12,14 & $1+x+x^{3}+x^{10}+x^{11}$ \\
+    1,2,6,7,8,10,11,12,14 & $1+x+x^{4}+x^{7}+x^{9}+x^{10}+x^{11}$ \\
+    1,3,5,6,8,10,12,13,14 & $1+x+x^{2}+x^{3}+x^{4}+x^{7}+x^{8}+x^{10}+x^{11}$ \\
+    1,3,5,7,8,9,10,12,14 & $1+x+x^{2}+x^{3}+x^{4}+x^{7}+x^{8}+x^{10}+x^{11}$ \\
+    1,3,6,8,9,10,12,13,14 & $1+x+x^{8}+x^{10}+x^{11}$ \\
+    2,3,4,5,7,9,10,12,14 & $1+x+x^{2}+x^{3}+x^{4}+x^{7}+x^{8}+x^{10}+x^{11}$ \\
+    2,3,4,5,7,10,12,13,14 & $1+x+x^{8}+x^{10}+x^{11}$ \\
+    2,3,4,6,7,8,9,11,14 & $1+x+x^{8}+x^{10}+x^{11}$ \\
+    2,3,4,6,7,8,12,13,14 & $1+x+x^{2}+x^{4}+x^{7}+x^{10}+x^{11}$ \\
+    2,3,4,8,9,10,12,13,14 & $1+x+x^{2}+x^{4}+x^{7}+x^{10}+x^{11}$ \\
+    2,4,5,6,7,9,11,13,14  & $1+x+x^{3}+x^{4}+x^{7}+x^{8}+x^{9}+x^{10}+x^{11}$ \\
+    2,4,5,7,9,10,11,12,14 & $1+x+x^{3}+x^{4}+x^{7}+x^{8}+x^{9}+x^{10}+x^{11}$ \\
+    3,5,6,7,8,10,11,12,14 & $1+x+x^{3}+x^{10}+x^{11}$ \\
+    4,5,6,8,9,10,12,13,14 & $1+x+x^{2}+x^{4}+x^{7}+x^{10}+x^{11}$ \\
+\end{tabular}
+\end{table}
+
+可以看到表（\ref{table:trivium_minimal}）中，作者列出了满足Trivium型算法的18组参数及其对应计算得到的本原多项式，从表中可知最高阶次数小于11的本原多项式中，并不能反向推出满足Trivium型算法的参数，从而本文著者得到以下结论：
+\begin{thm}[Trivium型算法对应的本原多项式最高次数最小为11]
+\label{thm:trivium_minimal}
+满足定义（\ref{defn:trivium}）的所有Trivium型算法中，Min(deg(g(x)))=11，所以Trivium型算法内部状态的至少有42位。
+
+定理\ref{thm:trivium_minimal}的证明由表（\ref{table:trivium_minimal}）可证。
+\end{thm}
+
+这个结论说明，Trivium型算法可以通过减少内部状态数量提高效率，然而减少后的内部状态数量仍有限制，且存在下限。
+
+
+\subsection{Trivum周期的构造}
+
+由上一节的结论可以找到相对周期较小的Trivium型算法进行研究，下面本文著者通过对参数为$\omega={1, 2, 4, 6, 8, 9, 11, 13, 14}$的Trivium型算法进行研究，试图找到能构造出能产生小周期的初始内部状态。
+
+\subsubsection{Trivum周期为1和3的构造}
+
+周期为1的初始内部状态非常容易找到，就是初始状态为全零的情况，且该种内部状态在任意Trivium型算法中的周期均为1。
+
+下面研究是否能构造出周期为3的初始内部状态，通过手动计算运行3轮Trivium算法后可以得到如下的方程组：
+
+\[s_{1}=s_{4}+s_{31}+s_{38}*s_{39}+s_{40},\]
+\[s_{2}=s_{5}+s_{32}+s_{39}*s_{40}+s_{41},\]
+\[s_{3}=s_{6}+s_{33}+s_{40}*s_{41}+s_{42},\]
+\[s_{4}=s_{1},s_{5}=s_{2},s_{6}=s_{3},\]
+\[s_{7}=s_{4},s_{8}=s_{5},s_{9}=s_{6},\]
+\[s_{10}=s_{7},s_{11}=s_{8},s_{12}=s_{9},\]
+\[s_{13}=s_{1}+s_{8}*s_{9}+s_{10}+s_{22},\]
+\[s_{14}=s_{2}+s_{9}*s_{10}+s_{11}+s_{23},\]
+\[s_{15}=s_{3}+s_{10}*s_{11}+s_{12}+s_{24},\]
+\[s_{16}=s_{13},s_{17}=s_{14},s_{18}=s_{15},\]
+\[s_{19}=s_{16},s_{20}=s_{17},s_{21}=s_{18},\]
+\[s_{22}=s_{19},s_{23}=s_{20},s_{24}=s_{21},\]
+\[s_{25}=s_{22},s_{26}=s_{23},s_{27}=s_{24},\]
+\[s_{28}=s_{16}+s_{23}*s_{24}+s_{25}+s_{37}\]
+\[s_{29}=s_{17}+s_{24}*s_{25}+s_{26}+s_{38}\]
+\[s_{30}=s_{18}+s_{25}*s_{26}+s_{27}+s_{39}\]
+\[s_{31}=s_{28},s_{32}=s_{29},s_{33}=s_{30}\]
+\[s_{34}=s_{31},s_{35}=s_{32},s_{36}=s_{33}\]
+\[s_{37}=s_{34},s_{38}=s_{35},s_{39}=s_{36}\]
+\[s_{40}=s_{37},s_{41}=s_{38},s_{42}=s_{39}\]
+
+将方程组合并整理后得到如下方程组：
+\[s_{4}+s_{31}+s_{38}*s_{39}+s_{40}=s_{1}=s_{4}=s_{7}=s_{10}\]
+\[s_{5}+s_{32}+s_{39}*s_{40}+s_{41}=s_{2}=s_{5}=s_{8}=s_{11}\]
+\[s_{6}+s_{33}+s_{40}*s_{41}+s_{42}=s_{3}=s_{6}=s_{9}=s_{12}\]
+\[s_{1}+s_{8}*s_{9}+s_{10}+s_{22}=s_{13}=s_{16}=s_{19}=s_{22}=s_{25}\]
+\[s_{2}+s_{9}*s_{10}+s_{11}+s_{23}=s_{14}=s_{17}=s_{20}=s_{23}=s_{26}\]
+\[s_{3}+s_{10}*s_{11}+s_{12}+s_{24}=s_{15}=s_{18}=s_{21}=s_{24}=s_{27}\]
+\[s_{16}+s_{23}*s_{24}+s_{25}+s_{37}=s_{28}=s_{31}=s_{34}=s_{37}=s_{40}\]
+\[s_{17}+s_{24}*s_{25}+s_{26}+s_{38}=s_{29}=s_{32}=s_{35}=s_{38}=s_{41}\]
+\[s_{18}+s_{25}*s_{26}+s_{27}+s_{39}=s_{30}=s_{33}=s_{36}=s_{39}=s_{42}\]
+
+令
+\[s_{4}+s_{31}+s_{38}*s_{39}+s_{40}=s_{1}=s_{4}=s_{7}=s_{10}=k_{1}\]
+\[s_{5}+s_{32}+s_{39}*s_{40}+s_{41}=s_{2}=s_{5}=s_{8}=s_{11}=k_{2}\]
+\[s_{6}+s_{33}+s_{40}*s_{41}+s_{42}=s_{3}=s_{6}=s_{9}=s_{12}=k_{3}\]
+\[s_{1}+s_{8}*s_{9}+s_{10}+s_{22}=s_{13}=s_{16}=s_{19}=s_{22}=s_{25}=k_{4}\]
+\[s_{2}+s_{9}*s_{10}+s_{11}+s_{23}=s_{14}=s_{17}=s_{20}=s_{23}=s_{26}=k_{5}\]
+\[s_{3}+s_{10}*s_{11}+s_{12}+s_{24}=s_{15}=s_{18}=s_{21}=s_{24}=s_{27}=k_{6}\]
+\[s_{16}+s_{23}*s_{24}+s_{25}+s_{37}=s_{28}=s_{31}=s_{34}=s_{37}=s_{40}=k_{7}\]
+\[s_{17}+s_{24}*s_{25}+s_{26}+s_{38}=s_{29}=s_{32}=s_{35}=s_{38}=s_{41}=k_{8}\]
+\[s_{18}+s_{25}*s_{26}+s_{27}+s_{39}=s_{30}=s_{33}=s_{36}=s_{39}=s_{42}=k_{9}\]
+
+再次整理合并后得到如下方程组：
+\[k_{1}*k_{2}=0\]
+\[k_{2}*k_{3}=0\]
+\[k_{1}*k_{3}=0\]
+\[k_{4}*k_{5}=0\]
+\[k_{5}*k_{6}=0\]
+\[k_{4}*k_{6}=0\]
+\[k_{7}*k_{8}=0\]
+\[k_{8}*k_{9}=0\]
+\[k_{7}*k_{9}=0\]
+
+\begin{equation}
+\label{eq:trivium_cycle_3_eg}
+\end{equation}
+
+由上述最终的方程组来看，实际求解并不十分复杂，最后可以得到如下解：保证$k_{1},k_{2},k_{3}$中至少有2个零，保证$k_{3},k_{4},k_{5}$中至少有2个零，保证$k_{6},k_{7},k_{8}$中至少有2个零，然后根据方程组将对应为置为对应的$k_{i}$即可。
+
+并且如果将方程组（\ref{eq:trivium_cycle_3_eg}）参数化，可以发现方程组仍然成立，并以此本文著者得到了进一步的结论：
+
+\begin{thm}[周期为3的Trivium型算法的初始内部状态的数量]
+\label{thm:trivium_cycle_3}
+Trivium型算法中，有且仅有21个不同的周期为3的初始内部状态，即共21个周期为3的圈。
+
+定理\ref{thm:trivium_cycle_3}的证明。
+\begin{proof}
+首先证明参数化的Trivium型算法经过三轮后仅有9项包含非线性部分的方程。
+
+首先第一轮Trivium中会在$s_{1}, s_{3\omega_{3}+1}, s_{3\omega_{6}+1}$上产生非线性部分，然后在后两轮中又在$s_{2}, s_{3\omega_{3}+2}, s_{3\omega_{6}+2}$, $s_{3}, s_{3\omega_{3}+3}, s_{3\omega_{6}+3}$上产生非线性部分，这样就有9项包含非线性部分的方程，且可以发现仅有位移及非线性部分可能产生新的含非线性部分的方程，因此仅有9个包含非线性部分的方程。
+
+然后证明这9个包含非线性部分的方程每个仅包含1项非线性项，且非线性项仅由两项构成。
+
+由定义（\ref{defn:trivium}）可发现，最终用到Trivium型算法的参数时都是做乘以3的处理，而对Trivium型算法的参数又要求$\omega[1] < \omega[2] < \ldots < \omega[9]$，因此可以保证参数两两之间至少相差1，因此可以保证在3轮Trivium后，已包含非线性项的部分不会被作为另一个非线性项的一部分，即不存在a*b，其中a又等于c*d的情况。
+
+有上述两个结论后，对参数化的Trivium型函数在3轮后可以得到下述方程组：
+
+\[s_{3\omega_{2}-2}+s_{3\omega_{7}-2}+s_{3\omega_{9}-4}*s_{3\omega_{9}-3}+s_{3\omega_{9}-2}=s_{1}=s_{4}=\ldots=s_{3\omega_{3}-2}\]
+\[s_{3\omega_{2}-1}+s_{3\omega_{7}-1}+s_{3\omega_{9}-3}*s_{3\omega_{9}-2}+s_{3\omega_{9}-1}=s_{2}=s_{5}=\ldots=s_{3\omega_{3}-1}\]
+\[s_{3\omega_{2}}+s_{3\omega_{7}}+s_{3\omega_{9}-2}*s_{3\omega_{9}-1}+s_{3\omega_{9}}=s_{3}=s_{6}=\ldots=s_{3\omega_{3}}\]
+\[s_{3\omega_{1}-2}+s_{3\omega_{5}-2}+s_{3\omega_{3}-4}*s_{3\omega_{3}-3}+s_{3\omega_{3}-2}=s_{3\omega_{3}+1}=s_{3\omega_{3}+4}=\ldots=s_{3\omega_{6}-2}\]
+\[s_{3\omega_{1}-1}+s_{3\omega_{5}-1}+s_{3\omega_{3}-3}*s_{3\omega_{3}-2}+s_{3\omega_{3}-1}=s_{3\omega_{3}+2}=s_{3\omega_{3}+5}=\ldots=s_{3\omega_{6}-1}\]
+\[s_{3\omega_{1}}+s_{3\omega_{5}}+s_{3\omega_{3}-2}*s_{3\omega_{3}-1}+s_{3\omega_{3}}=s_{3\omega_{3}+3}=s_{3\omega_{3}+6}=\ldots=s_{3\omega_{6}}\]
+\[s_{3\omega_{4}-2}+s_{3\omega_{8}-2}+s_{3\omega_{6}-4}*s_{3\omega_{6}-3}+s_{3\omega_{6}-2}=s_{3\omega_{6}+1}=s_{3\omega_{6}+4}=\ldots=s_{3\omega_{9}-2}\]
+\[s_{3\omega_{4}-1}+s_{3\omega_{8}-1}+s_{3\omega_{6}-3}*s_{3\omega_{6}-2}+s_{3\omega_{6}-1}=s_{3\omega_{6}+2}=s_{3\omega_{6}+5}=\ldots=s_{3\omega_{9}-1}\]
+\[s_{3\omega_{4}}+s_{3\omega_{8}}+s_{3\omega_{6}-2}*s_{3\omega_{6}-1}+s_{3\omega_{6}}=s_{3\omega_{6}+3}=s_{3\omega_{6}+6}=\ldots=s_{3\omega_{9}}\]
+
+令
+
+\[s_{3\omega_{2}-2}+s_{3\omega_{7}-2}+s_{3\omega_{9}-4}*s_{3\omega_{9}-3}+s_{3\omega_{9}-2}=s_{1}=s_{4}=\ldots=s_{3\omega_{3}-2}=k_{1}\]
+\[s_{3\omega_{2}-1}+s_{3\omega_{7}-1}+s_{3\omega_{9}-3}*s_{3\omega_{9}-2}+s_{3\omega_{9}-1}=s_{2}=s_{5}=\ldots=s_{3\omega_{3}-1}=k_{2}\]
+\[s_{3\omega_{2}}+s_{3\omega_{7}}+s_{3\omega_{9}-2}*s_{3\omega_{9}-1}+s_{3\omega_{9}}=s_{3}=s_{6}=\ldots=s_{3\omega_{3}}=k_{3}\]
+\[s_{3\omega_{1}-2}+s_{3\omega_{5}-2}+s_{3\omega_{3}-4}*s_{3\omega_{3}-3}+s_{3\omega_{3}-2}=s_{3\omega_{3}+1}=s_{3\omega_{3}+4}=\ldots=s_{3\omega_{6}-2}=k_{4}\]
+\[s_{3\omega_{1}-1}+s_{3\omega_{5}-1}+s_{3\omega_{3}-3}*s_{3\omega_{3}-2}+s_{3\omega_{3}-1}=s_{3\omega_{3}+2}=s_{3\omega_{3}+5}=\ldots=s_{3\omega_{6}-1}=k_{5}\]
+\[s_{3\omega_{1}}+s_{3\omega_{5}}+s_{3\omega_{3}-2}*s_{3\omega_{3}-1}+s_{3\omega_{3}}=s_{3\omega_{3}+3}=s_{3\omega_{3}+6}=\ldots=s_{3\omega_{6}}=k_{6}\]
+\[s_{3\omega_{4}-2}+s_{3\omega_{8}-2}+s_{3\omega_{6}-4}*s_{3\omega_{6}-3}+s_{3\omega_{6}-2}=s_{3\omega_{6}+1}=s_{3\omega_{6}+4}=\ldots=s_{3\omega_{9}-2}=k_{7}\]
+\[s_{3\omega_{4}-1}+s_{3\omega_{8}-1}+s_{3\omega_{6}-3}*s_{3\omega_{6}-2}+s_{3\omega_{6}-1}=s_{3\omega_{6}+2}=s_{3\omega_{6}+5}=\ldots=s_{3\omega_{9}-1}=k_{8}\]
+\[s_{3\omega_{4}}+s_{3\omega_{8}}+s_{3\omega_{6}-2}*s_{3\omega_{6}-1}+s_{3\omega_{6}}=s_{3\omega_{6}+3}=s_{3\omega_{6}+6}=\ldots=s_{3\omega_{9}}=k_{9}\]
+
+再次整理合并后得到如下方程组：
+\[k_{1}*k_{2}=0\]
+\[k_{2}*k_{3}=0\]
+\[k_{1}*k_{3}=0\]
+\[k_{4}*k_{5}=0\]
+\[k_{5}*k_{6}=0\]
+\[k_{4}*k_{6}=0\]
+\[k_{7}*k_{8}=0\]
+\[k_{8}*k_{9}=0\]
+\[k_{7}*k_{9}=0\]
+
+\begin{equation}
+\label{eq:trivium_cycle_3_param}
+\end{equation}
+可见解得方程组(\ref{eq:trivium_cycle_3_param})与先前是一样的，并且可以如下构造序列：
+\begin{align}
+\label{eq:trivium_cycle_3_param_res}
+\text{对于}a, b, c \in {(0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0)}\\
+S = (\underbrace{a,a,\cdots,a}_{\omega_{3}\text{个}a},\underbrace{b,b,\cdots,b}_{(\omega_{6}-\omega_{3})\text{个}b},\underbrace{c,c,\cdots,c}_{(\omega_{9}-\omega_{6})\text{个}c})^{T}
+\end{align}
+
+在式（\ref{eq:trivium_cycle_3_param_res}）中，a，b，c分别有四种取值可能，所以总共拥有$4^{3}=64$组解，其中包含周期为1的$S={0,0,\cdots,0}$，所以剩余63组解都是周期为3的，由于在非线性移位时，不同组彼此之间会相互转化，去除重复计算，可得总共有63/3=21的相互独立的解，即21个长度为3的圈。
+
+\end{proof}
+\end{thm}
