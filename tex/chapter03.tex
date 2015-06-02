@@ -60,7 +60,155 @@ RIFD标签分为有源和无源两种，无源RFID标签依靠RFID阅读器发�
 
 \subsubsection{RFID协议的选择}
 
-根据网上资料\parencite{射频技术（RFID）的安全协议}，基本的RFID安全协议有Hash-Lock协议、随机化的Hash-Lock协议、Hash链协议、基于Hash的ID变化协议、David的数字图书馆RFID协议、分布式RFID询问-应答认证协议、LCAP，它们的安全性如表\ref{tab:基本的RFID安全协议安全性分析}所示、性能如如表\ref{tab:基本的RFID安全协议性能分析}所示。
+基本的RFID安全协议有Hash-Lock协议、随机化的Hash-Lock协议、Hash链协议、基于Hash的ID变化协议、David的数字图书馆RFID协议、分布式RFID询问-应答认证协议、LCAP
+
+\\
+
+Hash-Lock协议原理如图\ref{fig:Hash-Lock协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/hashLock.pdf}
+	\caption{Hash-Lock协议图示}\label{fig:Hash-Lock协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器向其发送query消息请求认证。
+
+2)电子标签利用Hash函数对ID进行处理得到ID'发送给阅读器。
+
+3)阅读器收到ID'后再发送给后台应用系统。
+
+4)后台应用系统收到ID'后搜索所有标签，并计算对应的hash(ID)看是否与ID'相同，如果有就将ID与key发送给阅读器。
+
+5)阅读器收到ID与key后保留ID，然后将key发送给标签。
+
+6)标签收到key后，计算hash(key)看是否与ID相同，若相同则将ID发送给阅读器
+
+7)阅读器将标签与后台应用系统发来的两个ID对比，如果相同则验证成功
+
+\\
+
+随机化Hash-Lock协议原理如图\ref{fig:随机化Hash-Lock协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/randomHashLock.pdf}
+	\caption{随机化Hash-Lock协议图示}\label{fig:随机化Hash-Lock协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器向其发送query消息请求认证。
+
+2)电子标签产生一个随机数R，然后利用Hash函数对ID及R的串接进行处理得到hash($ID_{i}$, R)发送给阅读器。
+
+3)阅读器请求后台应用系统获取所有$ID_{j}$。
+
+4)后台应用系统将所有$ID_{j}$发送给阅读器。
+
+5)阅读器计算所有hash($ID_{j}$, R)看是否有$ID_{j}$能产生与hash($ID_{i}$, R)相同的结果，若有则将$ID_{j}$发送给标签。
+
+6)标签收到$ID_{j}$后，看是否与与自身的$ID_{i}$相同，若相同则验证成功
+
+\\
+
+Hash链协议原理如图\ref{fig:Hash链协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/hashChain.pdf}
+	\caption{Hash链协议图示}\label{fig:Hash链协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器向其发送query消息请求认证。
+
+2)电子标签利用Hash函数加密密钥K$_{t}$,J(即H(K$_{t}$,J))发送给阅读器，同时更新当前的密码值K$_{t}$,J+1=H(K$_{t}$,J)。
+
+3)阅读器收到电子标签发送来的H(K$_{t}$,J)继而转发给后台应用系统。
+
+4)后台应用系统查找数据库搜索存储的所有标签，计算是否有某个标签的ID$_{t}$使得H(K$_{t}$,J)=G(H$^{J-1}$(K$_{t}$,1))，若有，认证通过，并把ID$_{t}$发送给电子标签。否则认证失败。
+
+\\
+
+基于Hash的ID变化协议原理如图\ref{fig:基于Hash的ID变化协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/IDChangeHashChain.pdf}
+	\caption{基于Hash的ID变化协议图示}\label{fig:基于Hash的ID变化协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器向其发送query消息请求认证。
+
+2)电子标签将回话号加一，然后将H(ID),H(TID*ID),△TID发送给阅读器。
+
+3)阅读器收到电子标签发送来的H(ID),H(TID*ID),△TID继而转发给后台应用系统。
+
+4)后台应用系统还原出ID与TID*ID,与记录的数据比较，如果匹配上，产生随机数R，然后将R,H(R*TID*ID)发送给阅读器，然后同时更新TID、LST并将ID更新为ID异或R。
+
+5)阅读器收到后再发给标签，标签收到后验证，如果通过则更新自己的ID和LST。
+
+\\
+
+David的数字图书馆RFID协议原理如图\ref{fig:David的数字图书馆RFID协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/david.pdf}
+	\caption{David的数字图书馆RFID协议图示}\label{fig:David的数字图书馆RFID协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器生成随机数$R_{R}$与query消息一起发送给标签请求认证。
+
+2)电子标签产生随机数$R_{T}$，然后计算a=$ID_{i}+H_{k}(0,R_{R},R_{T})$并与$R_{T}$一起发送给阅读器。
+
+3)阅读器收到的数据转发给后台应用系统。
+
+4)后台应用系统比较所有标签看是否存在$ID_{j}$满足$ID_{j}=a+H_{k}(0,R_{R},R_{T})$，若有则认证通过，计算b=$ID_{i}+H_{k}(1,R_{R},R_{T})$并发送给阅读器。
+
+5)阅读器收到后再发给标签，标签收到后验证是否满足ID=$b+ID_{i}+H_{k}(1,R_{R},R_{T})$，如果满足则认证成功。
+
+\\
+
+分布式RFID询问-应答认证协议原理如图\ref{fig:分布式RFID询问-应答认证协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/queryResponse.pdf}
+	\caption{分布式RFID询问-应答认证协议图示}\label{fig:分布式RFID询问-应答认证协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器生成随机数$R_{R}$与query消息一起发送给标签请求认证。
+
+2)电子标签产生随机数$R_{T}$，然后计算$H(ID||R_{R}||R_{T})$并与$R_{T}$一起发送给阅读器。
+
+3)阅读器将收到的数据与$R_{R}$一起发给后台应用系统。
+
+4)后台应用系统比较所有标签看是否存在$ID_{j}$满足$H(ID_{j}||R_{R}||R_{T})=H(ID||R_{R}||R_{T})$，若有则认证通过，计算$H(ID_{j}||R_{T})$并发送给阅读器。
+
+5)阅读器收到后再发给标签，标签收到后验证是否满足$H(ID_{j}||R_{T})=H(ID||R_{T})$，如果满足则认证成功。
+
+\\
+
+LCAP协议原理如图\ref{fig:LCAP协议图示}所示。
+
+\begin{figure}[!htp]
+	\centering
+	\includegraphics[width=\textwidth]{chap3/LCAP.pdf}
+	\caption{LCAP协议图示}\label{fig:LCAP协议图示}
+\end{figure}
+
+1)当阅读器的识别范围内有电子标签进入时，阅读器生成随机数R与query消息一起发送给标签请求认证。
+
+2)电子标签计算haID=H(ID)与H(ID||R)的左半部分即$H_{L}(ID||R)$一起发送给阅读器。
+
+3)阅读器将收到的数据与R一起发给后台应用系统。
+
+4)后台应用系统检查储存的haID是否与发来的一致，若一致，则利用hash函数计算R与haID得到$H_{R}(ID||R)$，同时更新haID为H(ID+R)，更新ID为ID+R，并设置TD为H(ID+R)，然后将$H_{R}(ID||R)$发送给阅读器。
+
+5)阅读器收到后再发给标签，标签收到后验证有效性，如果成功则认证成功。
+
+\\
+
+根据网上资料\parencite{射频技术（RFID）的安全协议}，这些基本的RFID协议的安全性如表\ref{tab:基本的RFID安全协议安全性分析}所示、性能如如表\ref{tab:基本的RFID安全协议性能分析}所示。
 
 \begin{table}[!hbp]
 	\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}} 
@@ -118,21 +266,7 @@ RIFD标签分为有源和无源两种，无源RFID标签依靠RFID阅读器发�
 	\end{tabular}
 \end{table}
 
-通过这些基本的RFID安全协议的安全性和性能对比，以及协议本身的实现方法，最终本文中将采用Hash链协议为基础协议，在此之上改造为使用Trivium算法，Hash链协议原本原理如图\ref{fig:Hash链协议图示}所示。
-
-\begin{figure}[!htp]
-	\centering
-	\includegraphics[width=\textwidth]{chap3/hashChain.pdf}
-	\caption{Hash链协议图示}\label{fig:Hash链协议图示}
-\end{figure}
-
-1)当阅读器的识别范围内有电子标签进入时，阅读器向其发送query消息请求认证。
-
-2)电子标签利用Hash函数加密密钥K$_{t}$,J(即H(K$_{t}$,J))发送给阅读器，同时更新当前的密码值K$_{t}$,J+1=H(K$_{t}$,J)。
-
-3)阅读器收到电子标签发送来的H(K$_{t}$,J)继而转发给后台应用系统。
-
-4)后台应用系统查找数据库搜索存储的所有标签，计算是否有某个标签的ID$_{t}$使得H(K$_{t}$,J)=G(H$^{J-1}$(K$_{t}$,1))，若有，认证通过，并把ID$_{t}$发送给电子标签。否则认证失败。
+通过这些基本的RFID安全协议的安全性和性能对比，以及协议本身的实现方法，最终本文中将采用Hash链协议为基础协议，在此之上改造为使用Trivium算法。
 
 选择Hash链协议的原因首先在于它每次都使用Hash函数更新发送给阅读器的信息，这点可以类比到Trivium算法每轮产生一个密钥上，还有就是在标签和后台应用系统之间共享了一个初始密钥K$_{t}$,1，这点可以类比到Trivium算法的密钥和初始向量，因此Hash链协议可以简单地把Hash函数替换成Trivium算法来加以实现。
 
