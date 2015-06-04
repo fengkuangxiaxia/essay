@@ -462,14 +462,14 @@
 	  \fancyhf{}
 	  \fancyhead[L]{\includegraphics[width=0.22\textwidth]{figure/sjtubanner}}
 	  \fancyhead[R]{\nouppercase{\small\kaishu\sjtu@value@titlemark}}
-	  \fancyfoot[C]{\small 第~{\bfseries\thepage}~页\,共~{\bfseries\pageref{LastPage}}~页}
+	  \fancyfoot[C]{\small 第~{\bfseries\thepage}~页\,共~{\bfseries\pageref{lastpage}}~页}
 	}
 	%% 开章页页眉页脚
 	\fancypagestyle{plain}{% 设置开章页页眉页脚风格(只有页码作为页脚)
 	  \fancyhf{}%
 	  \fancyhead[L]{\nouppercase{\small\kaishu\includegraphics[width=0.22\textwidth]{figure/sjtubanner}}}
 	  \fancyhead[R]{\nouppercase{\small\kaishu\sjtu@value@titlemark}}
-	  \fancyfoot[C]{\small 第~{\bf\thepage}~页\,共~{\bf\pageref{LastPage}}~页}
+	  \fancyfoot[C]{\small 第~{\bf\thepage}~页\,共~{\bf\pageref{lastpage}}~页}
 	}
 \else
 	% 研究生学位论文页眉页脚设置
@@ -604,7 +604,9 @@
    {\endlist}
    
 \renewenvironment{thanks}
-  {\chapter{\sjtu@label@thanks}}
+  {\chapter{\sjtu@label@thanks}
+	  \label{lastpage}	
+  }
   {}
 
 \newenvironment{summary}
@@ -631,6 +633,32 @@
 	\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
 \end{center}
 }
+
+\newenvironment{bigabstract}
+{
+	\pagestyle{fancy}
+	\fancyhf{}
+	\fancyhead[L]{\small {\it \includegraphics[width=0.22\textwidth]{sjtubanner}}} % 奇数页左页眉
+	\fancyhead[R]{\small {\it \sjtu@value@englishtitle}} % 奇数页左页眉
+	\fancyfoot[C]{\small ~第~{\bf\thepage}~页~共~{\pageref{bigabstractlast}}~页~} % 页脚
+	%%  \fancyfoot[C]{\small ~第~{\bf\thepage}~页~} % 页脚
+	
+	
+	\fancypagestyle{plain}{% 设置开章页页眉页脚风格(只有页码作为页脚)
+		\fancyhf{}
+		\fancyhead[L]{\small {\it \includegraphics[width=0.22\textwidth]{sjtubanner}}} % 奇数页左页眉
+		\fancyhead[R]{\small {\it \sjtu@value@englishtitle}} % 奇数页左页眉
+		\fancyfoot[C]{\small ~第~{\bf\thepage}~页~共~{\pageref{bigabstractlast}}~页~} % 页脚
+		%%    \fancyfoot[C]{\small ~第~{\bf\thepage}~页~} % 页脚
+		%\renewcommand{\headrulewidth}{0pt}%
+		%\renewcommand{\footrulewidth}{0pt}%
+	}
+	
+	
+	\chapter*{\normalfont\zihao{3}\bf\textsc\sjtu@value@englishtitle\vskip 20pt}
+	\setcounter{page}{1}
+}
+{\label{bigabstractlast}}
 
 \endinput
 
