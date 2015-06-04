@@ -331,6 +331,94 @@
   \cleardoublepage
 }
 
+%%
+\def\sjtu@underline[#1]#2{%
+	\CTEXunderline{\hbox to #1{\hfill#2\hfill}}}
+\def\sjtuunderline{\@ifnextchar[\sjtu@underline\CTEXunderline}
+\newcommand\sjtuspace{\protect\CTEX@spaceChar\protect\CTEX@spaceChar}
+% “绘制”SJTU中文标题页
+\newcommand\newMaketitle[1]{%
+	\cleardoublepage
+	\thispagestyle{empty}
+	\begin{center}
+		\begin{figure}[!htp]
+			\centering
+			\includegraphics[angle=0,origin=br,width=13cm]{sjtu.jpg}
+		\end{figure}
+		\heiti\zihao{-2}{SHANGHAI JIAO TONG UNIVERSITY}
+		\vskip 15pt
+		\kaishu\zihao{1}{学士学位论文}
+		\vskip 5pt
+		\heiti\zihao{-2}{BACHELOR'S THESIS}
+		\begin{figure}[!htp]
+			\centering
+			\includegraphics[angle=0,origin=br,width=4cm]{sjtubadge.png}
+		\end{figure}
+		\vskip 20pt
+		\begin{tabular}{ll}
+			\huge{\kaishu{论文题目}} &\kaishu
+			\sjtuunderline[350pt]{\sjtu@value@title}
+		\end{tabular}
+		\vskip 5pt
+		{\fangsong\zihao{4}}
+		\def\tabcolsep{1pt}
+		\def\arraystretch{1}
+		\begin{tabular}{lc}
+			\kaishu{学生姓名} &\kaishu
+			\sjtuunderline[250pt]{\sjtu@value@author}
+			\\
+			\kaishu{学生学号} &\kaishu
+			\sjtuunderline[250pt]{\sjtu@value@studentnumber}
+			\\
+			\kaishu{指导教师} &\kaishu
+			\sjtuunderline[250pt]{\sjtu@value@advisor}
+			\\  
+			\kaishu{专\sjtuspace{}业} &\kaishu
+			\sjtuunderline[250pt]{\sjtu@value@major}
+			\\  
+			\kaishu{学院（系）} &\kaishu
+			\sjtuunderline[250pt]{\sjtu@value@institute}
+		\end{tabular}
+	\end{center}
+	\vskip \stretch{0.5}
+	\clearpage
+	\if@twoside
+	
+	\cleardoublepage
+	\fi
+}
+
+\newcommand\newMakeenglishtitle[1]{%
+	\cleardoublepage
+	\thispagestyle{empty}
+	\begin{center}
+		{\normalfont\zihao{4} {Submitted in total fulfilment
+				of the requirements for the degree of \sjtu@value@englishdegree \\
+				in \sjtu@value@englishmajor}}
+		\vspace*{20pt}
+		\vskip\stretch{1}
+		{\zihao{-1} \sjtu@value@englishtitle}
+		\vskip \stretch{1}
+		{\normalfont\zihao{4} \sjtu@value@englishauthor}
+		\vskip \stretch{1}
+		{\normalfont\zihao{4} {Supervisor}}
+		\vskip 3pt
+		{\normalfont\zihao{4} \sjtu@value@englishadvisor}
+		\vskip \stretch{2}
+		\normalfont\normalsize \sjtu@value@englishinstitute
+		\vskip 30pt
+		\normalfont\normalsize \sjtu@value@englishdate
+		\vskip 20pt
+	\end{center}
+	\clearpage
+	\if@twoside
+	\thispagestyle{empty}
+	\cleardoublepage
+	\fi
+}
+
+%%
+
 % 原创性声明
 \newcommand\makeDeclareOriginal{%
   \cleardoublepage
