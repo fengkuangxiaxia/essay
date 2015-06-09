@@ -71,6 +71,7 @@
 \RequirePackage{pdfpages}
 \RequirePackage{calc}
 \RequirePackage{algorithm, algorithmic}
+\RequirePackage{chngcntr}
 
 %==========
 % Segment 2. Define general-purpose LaTeX commands.
@@ -620,9 +621,11 @@
 {% \begin{breakablealgorithm}
 	\begin{center}
 		\refstepcounter{algorithm}% New algorithm
+		\counterwithin{algorithm}{chapter}
+		\renewcommand{\thealgorithm}{\arabic{chapter}--\arabic{algorithm}}
 		\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
 		\renewcommand{\caption}[2][\relax]{% Make a new \caption
-			{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+			{\raggedright\textbf{\sjtu@label@algo~\thealgorithm} ##2\par}%
 			\ifx\relax##1\relax % #1 is \relax
 			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
 			\else % #1 is not \relax
