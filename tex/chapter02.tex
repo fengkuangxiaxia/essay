@@ -9,7 +9,7 @@
 
 由Christophe De 和 Bart Preneel设计的标准Trivium算法共有288个内部状态位，这288位内部状态的每一次更新构成了Trivium算法生成密钥流中一位密钥的生成来源， Trivium算法的具体应用步骤如下：
 
-\begin{enumerate}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\begin{enumerate}[label=(\arabic*),noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
   \item 密钥分配阶段：用户通过事先定义或者协商得到密钥K和初始向量IV。
   \item 初始化阶段：将密钥K和初始向量IV装填入Trivium的288位的内部状态中，并运行几轮Trivium算法更新内部状态。
   \item 密钥流生成阶段：每运行一轮Trivium，更新内部状态并生成一位密钥输出。
@@ -21,7 +21,7 @@
 
 Trivium算法内部状态的初始化，可以用以下步骤描述：
 
-\begin{enumerate}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\begin{enumerate}[label=(\arabic*),noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
   \item 将Trivium的内部状态分为3个部分，第一部位为1到93位，第二部分为94到177位，第三部分为178到288位。
   \item 将80比特的密钥装填入第一部分的前80位即1到80位，并将第一部分的其他位置0，即81到93位置0。
   \item 将80比特的初始向量装填入第二部分的前80位即94到173位，并将第二部分的其他位置0，即174到177位置0。
