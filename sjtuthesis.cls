@@ -130,7 +130,7 @@
 \CTEXsetup[nameformat={\Large\bfseries}]{chapter}
 \CTEXsetup[titleformat={\Large\bfseries}]{chapter}
 \CTEXsetup[beforeskip={15\p@}]{chapter}
-\CTEXsetup[afterskip={12\p@}]{chapter}
+\CTEXsetup[afterskip={25\p@}]{chapter}
 % Title Settings at the section Level
 \CTEXsetup[format={\large\bfseries}]{section}
 \CTEXsetup[beforeskip={-3ex \@plus -1ex \@minus -.2ex}]{section}
@@ -508,12 +508,12 @@
 
 % 中英文摘要
 \newenvironment{abstract}{\chapter*{\sjtu@value@title\vskip 20pt\sjtu@label@abstract}\markboth{\sjtu@label@abstract}{}}{}
-\newcommand\keywords[1]{\vspace{2ex}\noindent{\bf\large \sjtu@label@keywords} #1}
+\newcommand\keywords[1]{~\\\vspace{2ex}\noindent{\bf\large \sjtu@label@keywords} #1}
 \newenvironment{englishabstract}{\chapter*{\sjtu@value@englishtitle\vskip 20pt\bfseries \sjtu@label@englishabstract}\markboth{\sjtu@label@englishabstract}{}}{}
-\newcommand\englishkeywords[1]{\vspace{2ex}\noindent{\bf\large \sjtu@label@englishkeywords} #1}
+\newcommand\englishkeywords[1]{~\\\vspace{2ex}\noindent{\bf\large \sjtu@label@englishkeywords} #1}
 
 \renewcommand\tableofcontents{%
-  \chapter*{\contentsname}
+  \chapter*{\contentsname} \vskip -20 pt
   \@mkboth{\MakeUppercase\contentsname}{\MakeUppercase\contentsname}%
   \@starttoc{toc}%
 }
@@ -610,7 +610,8 @@
   {}
 
 \newenvironment{summary}
-{\chapter*{\sjtu@label@summary\markboth{\sjtu@label@summary}{}}\addcontentsline{toc}{chapter}{\sjtu@label@summary}
+{%\chapter*{\sjtu@label@summary\markboth{\sjtu@label@summary}{}}\addcontentsline{toc}{chapter}{\sjtu@label@summary}
+	\chapter{\sjtu@label@summary}
 }{}
 
 \newenvironment{symbolnote}{\chapter{\sjtu@label@symbolnote}}{} 
@@ -655,11 +656,11 @@
 	}
 	
 	
-	\chapter*{\normalfont\zihao{3}\bf\textsc\sjtu@value@englishtitle\vskip 20pt}
+	\chapter*{\normalfont\zihao{3}\bf\textsc\sjtu@value@englishtitle}
 	\setcounter{page}{1}
 }
-{\label{bigabstractlast}}
-\clearpage
+{\label{bigabstractlast}\clearpage}
+
 
 \endinput
 
