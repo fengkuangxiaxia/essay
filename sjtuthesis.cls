@@ -360,7 +360,7 @@
 			\huge{\kaishu{论文题目}} &\kaishu
 			\sjtuunderline[350pt]{\sjtu@value@title}
 		\end{tabular}
-		\vskip 5pt
+		\vskip 45pt
 		{\fangsong\zihao{4}}
 		\def\tabcolsep{1pt}
 		\def\arraystretch{1}
