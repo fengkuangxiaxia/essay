@@ -128,16 +128,16 @@
 \renewcommand{\listalgorithmname}{\sjtu@listalgorithmname}
 \renewcommand{\lstlistingname}{\sjtu@value@listingname}
 % Title Settings at the chapter Level
-\CTEXsetup[nameformat={\Large\bfseries}]{chapter}
+\CTEXsetup[nameformat={\Large\bfseries\zihao{3}}]{chapter}
 \CTEXsetup[titleformat={\Large\bfseries}]{chapter}
 \CTEXsetup[beforeskip={15\p@}]{chapter}
 \CTEXsetup[afterskip={25\p@}]{chapter}
 % Title Settings at the section Level
-\CTEXsetup[format={\large\bfseries}]{section}
+\CTEXsetup[format={\large\heiti\zihao{4}}]{section}
 \CTEXsetup[beforeskip={-3ex \@plus -1ex \@minus -.2ex}]{section}
 \CTEXsetup[afterskip={1.0ex \@plus .2ex}]{section}
 % Title Settings at the subection Level
-\CTEXsetup[format={\bfseries\normalsize}]{subsection}
+\CTEXsetup[format={\songti\zihao{-4}}]{subsection}
 \CTEXsetup[indent={0\ccwd}]{subsection}
 \CTEXsetup[beforeskip={-2.5ex \@plus -1ex \@minus -.2ex}]{subsection}
 \CTEXsetup[afterskip={1.0ex \@plus .2ex}]{subsection}
