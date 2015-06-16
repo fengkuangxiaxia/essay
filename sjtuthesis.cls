@@ -47,7 +47,7 @@
 % Segment 1. Import LaTeX packages.
 %==========
 
-\RequirePackage[centering,a4paper,body={16cm,22cm}]{geometry} %设置版面
+\RequirePackage[centering,a4paper,body={16cm,24cm}]{geometry} %设置版面
 \RequirePackage{lastpage}
 \RequirePackage{fontspec}
 \RequirePackage{metalogo,doc}
@@ -78,7 +78,7 @@
 %==========
 
 \setcounter{secnumdepth}{4}  % 章节编号深度 (part 对应 -1)
-\setcounter{tocdepth}{4}     % 目录深度 (part 对应 -1)
+\setcounter{tocdepth}{2}     % 目录深度 (part 对应 -1)
     
 % User defined command list
 %% \me \mi \mj \dif \cleardoublepage \cndash \CJKLaTeX
