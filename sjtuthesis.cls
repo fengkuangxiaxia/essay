@@ -47,7 +47,9 @@
 % Segment 1. Import LaTeX packages.
 %==========
 
-\RequirePackage[centering,a4paper,body={16cm,24cm}]{geometry} %设置版面
+%\RequirePackage[centering,a4paper,body={16cm,24cm}]{geometry} %设置版面
+\RequirePackage[centering,a4paper]{geometry}
+\geometry{left=3.18cm,right=3.18cm,top=2.54cm,bottom=2.54cm}
 \RequirePackage{lastpage}
 \RequirePackage{fontspec}
 \RequirePackage{metalogo,doc}
@@ -134,11 +136,12 @@
 \CTEXsetup[afterskip={25\p@}]{chapter}
 % Title Settings at the section Level
 \CTEXsetup[format={\large\heiti\zihao{4}}]{section}
+\CTEXsetup[indent={2\ccwd}]{section}
 \CTEXsetup[beforeskip={-3ex \@plus -1ex \@minus -.2ex}]{section}
 \CTEXsetup[afterskip={1.0ex \@plus .2ex}]{section}
 % Title Settings at the subection Level
 \CTEXsetup[format={\songti\zihao{-4}}]{subsection}
-\CTEXsetup[indent={0\ccwd}]{subsection}
+\CTEXsetup[indent={2\ccwd}]{subsection}
 \CTEXsetup[beforeskip={-2.5ex \@plus -1ex \@minus -.2ex}]{subsection}
 \CTEXsetup[afterskip={1.0ex \@plus .2ex}]{subsection}
 % Title Settings at the subsubection Level
